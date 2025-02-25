@@ -49,14 +49,14 @@ service_create() {
   dokku_log_info2 "Extracting config files"
   TEMP_DOCKER_CONTAINER_ID=$("$DOCKER_BIN" container create "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION")
 
-  "$DOCKER_BIN" container cp "${TEMP_DOCKER_CONTAINER_ID}:/usr/share/elasticsearch/config/" "$SERVICE_ROOT/"
+  "$DOCKER_BIN" container cp "${TEMP_DOCKER_CONTAINER_ID}:/usr/share/opensearch/config/" "$SERVICE_ROOT/"
   "$DOCKER_BIN" container rm -v "${TEMP_DOCKER_CONTAINER_ID}" >/dev/null
   sed -i.bak 's#Xms1g#Xms512m#g; s#Xmx1g#Xmx512m#g' "$SERVICE_ROOT/$PLUGIN_CONFIG_SUFFIX/jvm.options"
 
-  local ELASTICSEARCH_MAJOR_VERSION=$(echo "$PLUGIN_IMAGE_VERSION" | cut -d '.' -f 1)
-  if [[ "$ELASTICSEARCH_MAJOR_VERSION" -ge "7" ]]; then
-    if ! grep -q "initial_master_nodes" "$SERVICE_ROOT/$PLUGIN_CONFIG_SUFFIX/elasticsearch.yml" >/dev/null; then
-      sigil -f "$PLUGIN_BASE_PATH/$PLUGIN_COMMAND_PREFIX/templates/$ELASTICSEARCH_MAJOR_VERSION-config.yml.sigil" SERVICE_NAME="$SERVICE_NAME" >"$SERVICE_ROOT/$PLUGIN_CONFIG_SUFFIX/elasticsearch.yml"
+  local OPENSEARCH_MAJOR_VERSION=$(echo "$PLUGIN_IMAGE_VERSION" | cut -d '.' -f 1)
+  if [[ "$OPENSEARCH_MAJOR_VERSION" -ge "7" ]]; then
+    if ! grep -q "initial_master_nodes" "$SERVICE_ROOT/$PLUGIN_CONFIG_SUFFIX/opensearch.yml" >/dev/null; then
+      sigil -f "$PLUGIN_BASE_PATH/$PLUGIN_COMMAND_PREFIX/templates/$OPENSEARCH_MAJOR_VERSION-config.yml.sigil" SERVICE_NAME="$SERVICE_NAME" >"$SERVICE_ROOT/$PLUGIN_CONFIG_SUFFIX/opensearch.yml"
     fi
   fi
 
@@ -73,7 +73,7 @@ service_create_container() {
   local SERVICE_HOST_ROOT="$PLUGIN_DATA_HOST_ROOT/$SERVICE"
   local SERVICE_NAME="$(get_service_name "$SERVICE")"
 
-  local ELASTICSEARCH_MAJOR_VERSION=$(echo "$PLUGIN_IMAGE_VERSION" | cut -d '.' -f 1)
+  local OPENSEARCH_MAJOR_VERSION=$(echo "$PLUGIN_IMAGE_VERSION" | cut -d '.' -f 1)
 
   if [[ -f "$SERVICE_ROOT/CONFIG_OPTIONS" ]]; then
     export CONFIG_OPTIONS="$(cat "$SERVICE_ROOT/CONFIG_OPTIONS")"
@@ -91,8 +91,8 @@ service_create_container() {
   DOCKER_ARGS+=("--label=dokku=service")
   DOCKER_ARGS+=("--name=$SERVICE_NAME")
   DOCKER_ARGS+=("--restart=always")
-  DOCKER_ARGS+=("--volume=$SERVICE_HOST_ROOT/$PLUGIN_CONFIG_SUFFIX:/usr/share/elasticsearch/config")
-  DOCKER_ARGS+=("--volume=$SERVICE_HOST_ROOT/data:/usr/share/elasticsearch/data")
+  DOCKER_ARGS+=("--volume=$SERVICE_HOST_ROOT/$PLUGIN_CONFIG_SUFFIX:/usr/share/opensearch/config")
+  DOCKER_ARGS+=("--volume=$SERVICE_HOST_ROOT/data:/usr/share/opensearch/data")
 
   declare -a LINK_CONTAINER_DOCKER_ARGS
   LINK_CONTAINER_DOCKER_ARGS=()
@@ -121,9 +121,9 @@ service_create_container() {
   fi
 
   dokku_log_info2 "Set file permissions for config"
-  "$DOCKER_BIN" container run --rm "--volume=$SERVICE_HOST_ROOT/$PLUGIN_CONFIG_SUFFIX:/usr/share/elasticsearch/config" "--volume=$SERVICE_HOST_ROOT/data:/usr/share/elasticsearch/data" --entrypoint "" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" chown -R 1000:0 /usr/share/elasticsearch/config
+  "$DOCKER_BIN" container run --rm "--volume=$SERVICE_HOST_ROOT/$PLUGIN_CONFIG_SUFFIX:/usr/share/opensearch/config" "--volume=$SERVICE_HOST_ROOT/data:/usr/share/opensearch/data" --entrypoint "" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" chown -R 1000:0 /usr/share/opensearch/config
   dokku_log_info2 "Set file permissions for data"
-  "$DOCKER_BIN" container run --rm "--volume=$SERVICE_HOST_ROOT/$PLUGIN_CONFIG_SUFFIX:/usr/share/elasticsearch/config" "--volume=$SERVICE_HOST_ROOT/data:/usr/share/elasticsearch/data" --entrypoint "" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" chown -R 1000:0 /usr/share/elasticsearch/data
+  "$DOCKER_BIN" container run --rm "--volume=$SERVICE_HOST_ROOT/$PLUGIN_CONFIG_SUFFIX:/usr/share/opensearch/config" "--volume=$SERVICE_HOST_ROOT/data:/usr/share/opensearch/data" --entrypoint "" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" chown -R 1000:0 /usr/share/opensearch/data
 
   # shellcheck disable=SC2086
   suppress_output "$DOCKER_BIN" container create "${DOCKER_ARGS[@]}" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" $CONFIG_OPTIONS
@@ -163,7 +163,7 @@ service_check_sysctl() {
   local VM_MAX_MAP_COUNT_REQUIRED=262144
 
   if [ "$VM_MAX_MAP_COUNT_CURRENT" -lt "$VM_MAX_MAP_COUNT_REQUIRED" ]; then
-    dokku_log_fail "Please update /etc/systctl.conf with 'vm.max_map_count = 262144' to accommodate ElasticSearch, for ex.: echo 'vm.max_map_count=262144' | sudo tee -a /etc/sysctl.conf; sudo sysctl -p"
+    dokku_log_fail "Please update /etc/systctl.conf with 'vm.max_map_count = 262144' to accommodate OpenSearch, for ex.: echo 'vm.max_map_count=262144' | sudo tee -a /etc/sysctl.conf; sudo sysctl -p"
   fi
 }
 

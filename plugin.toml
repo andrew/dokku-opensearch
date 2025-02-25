@@ -1,4 +1,4 @@
 [plugin]
-description = "dokku elasticsearch service plugin"
+description = "dokku opensearch service plugin"
 version = "1.36.0"
 [plugin.config]

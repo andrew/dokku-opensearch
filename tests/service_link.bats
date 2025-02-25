@@ -50,32 +50,32 @@ teardown() {
   run dokku "$PLUGIN_COMMAND_PREFIX:link" ls my-app
   echo "output: $output"
   echo "status: $status"
-  assert_contains "${lines[*]}" "Already linked as ELASTICSEARCH_URL"
+  assert_contains "${lines[*]}" "Already linked as OPENSEARCH_URL"
   assert_failure
 
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) exports ELASTICSEARCH_URL to app" {
+@test "($PLUGIN_COMMAND_PREFIX:link) exports OPENSEARCH_URL to app" {
   run dokku "$PLUGIN_COMMAND_PREFIX:link" ls my-app
   echo "output: $output"
   echo "status: $status"
-  url=$(dokku config:get my-app ELASTICSEARCH_URL)
-  assert_contains "$url" "http://dokku-elasticsearch-ls:9200"
+  url=$(dokku config:get my-app OPENSEARCH_URL)
+  assert_contains "$url" "http://dokku-opensearch-ls:9200"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) generates an alternate config url when ELASTICSEARCH_URL already in use" {
-  dokku config:set my-app ELASTICSEARCH_URL=http://host:9200
+@test "($PLUGIN_COMMAND_PREFIX:link) generates an alternate config url when OPENSEARCH_URL already in use" {
+  dokku config:set my-app OPENSEARCH_URL=http://host:9200
   dokku "$PLUGIN_COMMAND_PREFIX:link" ls my-app
   run dokku config my-app
-  assert_contains "${lines[*]}" "DOKKU_ELASTICSEARCH_AQUA_URL"
+  assert_contains "${lines[*]}" "DOKKU_OPENSEARCH_AQUA_URL"
   assert_success
 
   dokku "$PLUGIN_COMMAND_PREFIX:link" ms my-app
   run dokku config my-app
-  assert_contains "${lines[*]}" "DOKKU_ELASTICSEARCH_BLACK_URL"
+  assert_contains "${lines[*]}" "DOKKU_OPENSEARCH_BLACK_URL"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ms my-app
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
@@ -84,23 +84,23 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:link) links to app with docker-options" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" ls my-app
   run dokku docker-options:report my-app
-  assert_contains "${lines[*]}" "--link dokku.elasticsearch.ls:dokku-elasticsearch-ls"
+  assert_contains "${lines[*]}" "--link dokku.opensearch.ls:dokku-opensearch-ls"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) uses apps ELASTICSEARCH_DATABASE_SCHEME variable" {
-  dokku config:set my-app ELASTICSEARCH_DATABASE_SCHEME=elasticsearch2
+@test "($PLUGIN_COMMAND_PREFIX:link) uses apps OPENSEARCH_DATABASE_SCHEME variable" {
+  dokku config:set my-app OPENSEARCH_DATABASE_SCHEME=opensearch2
   dokku "$PLUGIN_COMMAND_PREFIX:link" ls my-app
-  url=$(dokku config:get my-app ELASTICSEARCH_URL)
-  assert_contains "$url" "elasticsearch2://dokku-elasticsearch-ls:9200"
+  url=$(dokku config:get my-app OPENSEARCH_URL)
+  assert_contains "$url" "opensearch2://dokku-opensearch-ls:9200"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:link) adds a querystring" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" ls my-app --querystring "pool=5"
-  url=$(dokku config:get my-app ELASTICSEARCH_URL)
+  url=$(dokku config:get my-app OPENSEARCH_URL)
   assert_contains "$url" "?pool=5"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
@@ -109,7 +109,7 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:link) uses a specified config url when alias is specified" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" ls my-app --alias "ALIAS"
   url=$(dokku config:get my-app ALIAS_URL)
-  assert_contains "$url" "http://dokku-elasticsearch-ls:9200"
+  assert_contains "$url" "http://dokku-opensearch-ls:9200"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
 }

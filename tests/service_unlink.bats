@@ -48,7 +48,7 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:unlink) unsets config url from app" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" ls my-app >&2
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
-  config=$(dokku config:get my-app ELASTICSEARCH_URL || true)
+  config=$(dokku config:get my-app OPENSEARCH_URL || true)
   assert_equal "$config" ""
 }
 

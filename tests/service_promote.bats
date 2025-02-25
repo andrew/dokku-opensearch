@@ -35,25 +35,25 @@ teardown() {
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) error when the service is already promoted" {
   run dokku "$PLUGIN_COMMAND_PREFIX:promote" l my-app
-  assert_contains "${lines[*]}" "already promoted as ELASTICSEARCH_URL"
+  assert_contains "${lines[*]}" "already promoted as OPENSEARCH_URL"
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:promote) changes ELASTICSEARCH_URL" {
-  dokku config:set my-app "ELASTICSEARCH_URL=http://host:9200" "DOKKU_ELASTICSEARCH_BLUE_URL=http://dokku-elasticsearch-l:9200"
+@test "($PLUGIN_COMMAND_PREFIX:promote) changes OPENSEARCH_URL" {
+  dokku config:set my-app "OPENSEARCH_URL=http://host:9200" "DOKKU_OPENSEARCH_BLUE_URL=http://dokku-opensearch-l:9200"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my-app
-  url=$(dokku config:get my-app ELASTICSEARCH_URL)
-  assert_equal "$url" "http://dokku-elasticsearch-l:9200"
+  url=$(dokku config:get my-app OPENSEARCH_URL)
+  assert_equal "$url" "http://dokku-opensearch-l:9200"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) creates new config url when needed" {
-  dokku config:set my-app "ELASTICSEARCH_URL=http://host:9200" "DOKKU_ELASTICSEARCH_BLUE_URL=http://dokku-elasticsearch-l:9200"
+  dokku config:set my-app "OPENSEARCH_URL=http://host:9200" "DOKKU_OPENSEARCH_BLUE_URL=http://dokku-opensearch-l:9200"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my-app
   run dokku config my-app
-  assert_contains "${lines[*]}" "DOKKU_ELASTICSEARCH_"
+  assert_contains "${lines[*]}" "DOKKU_OPENSEARCH_"
 }
-@test "($PLUGIN_COMMAND_PREFIX:promote) uses ELASTICSEARCH_DATABASE_SCHEME variable" {
-  dokku config:set my-app "ELASTICSEARCH_DATABASE_SCHEME=elasticsearch2" "ELASTICSEARCH_URL=http://host:9200" "DOKKU_ELASTICSEARCH_BLUE_URL=elasticsearch2://dokku-elasticsearch-l:9200"
+@test "($PLUGIN_COMMAND_PREFIX:promote) uses OPENSEARCH_DATABASE_SCHEME variable" {
+  dokku config:set my-app "OPENSEARCH_DATABASE_SCHEME=opensearch2" "OPENSEARCH_URL=http://host:9200" "DOKKU_OPENSEARCH_BLUE_URL=opensearch2://dokku-opensearch-l:9200"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my-app
-  url=$(dokku config:get my-app ELASTICSEARCH_URL)
-  assert_contains "$url" "elasticsearch2://dokku-elasticsearch-l:9200"
+  url=$(dokku config:get my-app OPENSEARCH_URL)
+  assert_contains "$url" "opensearch2://dokku-opensearch-l:9200"
 }
