@@ -1,6 +1,6 @@
 # dokku opensearch [![Build Status](https://img.shields.io/github/actions/workflow/status/andrew/dokku-opensearch/ci.yml?branch=master&style=flat-square "Build Status")](https://github.com/andrew/dokku-opensearch/actions/workflows/ci.yml?query=branch%3Amaster) [![IRC Network](https://img.shields.io/badge/irc-libera-blue.svg?style=flat-square "IRC Libera")](https://webchat.libera.chat/?channels=dokku)
 
-Official opensearch plugin for dokku. Currently defaults to installing [opensearch 7.17.10](https://hub.docker.com/_/opensearch/).
+Official opensearch plugin for dokku. Currently defaults to installing [opensearch 1.3.20](https://hub.docker.com/r/opensearchproject/opensearch).
 
 ## Requirements
 
